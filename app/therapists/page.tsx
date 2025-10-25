@@ -199,9 +199,13 @@ const TherapistDirectory = () => {
                 {/* Actions */}
                 <div className="flex gap-2">
                   {therapist.acceptingNew ? (
-                    <button className="flex-1 bg-blue-600 text-white px-4 py-2 mt-5 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-                      Book Consultation
-                    </button>
+                    // In app/therapists/page.js - update the booking button
+<button 
+  onClick={() => handleTherapistClick(therapist.id)}
+  className="flex-1 bg-blue-600 text-white px-4 py-2 mt-5 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+>
+  Book Consultation
+</button>
                   ) : (
                     <button className="flex-1 bg-gray-300 text-gray-600 px-4 py-2 rounded-lg font-medium cursor-not-allowed">
                       Join Waitlist

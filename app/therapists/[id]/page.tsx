@@ -1,4 +1,4 @@
-// app/therapists/[id]/page.js
+// app/therapists/[id]/page.js (COMPLETE WITH ALL ORIGINAL CONTENT)
 "use client";
 
 import React, { useState, use } from 'react';
@@ -6,9 +6,11 @@ import { useRouter } from 'next/navigation';
 import { ChevronLeft, MapPin, DollarSign, Clock, Award, CheckCircle } from 'lucide-react';
 import { findTherapistById, getTherapistInitials } from '../../../lib/therapists';
 import BackButton from '../../../components/BackButton';
+import BookingModal from '../../../components/BookingModal';
 
 const TherapistProfilePage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [activeTab, setActiveTab] = useState('My Approach');
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const router = useRouter();
 
   // Unwrap the params Promise
@@ -57,7 +59,10 @@ const TherapistProfilePage = ({ params }: { params: Promise<{ id: string }> }) =
                 </div>
               </div>
             </div>
-            <button className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-lg">
+            <button 
+              onClick={() => setIsBookingModalOpen(true)}
+              className="bg-blue-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-lg"
+            >
               Request a Call
             </button>
           </div>
@@ -297,11 +302,21 @@ const TherapistProfilePage = ({ params }: { params: Promise<{ id: string }> }) =
         <div className="mt-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-3xl p-8 text-white text-center">
           <h2 className="text-2xl font-bold mb-3">Ready to get started?</h2>
           <p className="text-blue-100 mb-6">Take the first step towards better mental health today.</p>
-          <button className="bg-white text-blue-600 px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors shadow-lg">
+          <button 
+            onClick={() => setIsBookingModalOpen(true)}
+            className="bg-white text-blue-600 px-8 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors shadow-lg"
+          >
             Request a Call
           </button>
         </div>
       </div>
+
+      {/* Booking Modal */}
+      <BookingModal
+        therapist={therapist}
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+      />
     </div>
   );
 };
