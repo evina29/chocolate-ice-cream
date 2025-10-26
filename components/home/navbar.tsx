@@ -58,13 +58,13 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Login Button */}
+      {/* Dashboard Button */}
       <div>
         <button 
-          onClick={() => router.push('/therapists')}
+          onClick={() => router.push('/dashboard')}
           className="bg-yellow-100 text-gray-800 px-6 py-2 rounded-full hover:bg-yellow-200 transition-colors font-medium cursor-pointer shadow-lg"
         >
-          Get Started
+          Dashboard
         </button>
       </div>
     </nav>
