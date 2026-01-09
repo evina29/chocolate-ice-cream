@@ -8,17 +8,56 @@ const HeroSection = () => {
   const router = useRouter();
   const { settings } = useAccessibility();
   const [animationsTriggered, setAnimationsTriggered] = useState(false);
+  const [currentQuoteIndex, setCurrentQuoteIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const quotes = [
+    'Your Mental Health Matters',
+    'You Are Not Alone',
+    'Healing Starts Here',
+    'Your Journey, Your Pace',
+    'Every Step Counts'
+  ];
 
   useEffect(() => {
     setAnimationsTriggered(true);
   }, []);
 
+  // Typewriter effect
+  useEffect(() => {
+    const currentQuote = quotes[currentQuoteIndex];
+    const typingSpeed = isDeleting ? 50 : 100;
+    const pauseTime = isDeleting ? 1000 : 2000;
+
+    if (!isDeleting && displayedText === currentQuote) {
+      setTimeout(() => setIsDeleting(true), pauseTime);
+      return;
+    }
+
+    if (isDeleting && displayedText === '') {
+      setIsDeleting(false);
+      setCurrentQuoteIndex((prev) => (prev + 1) % quotes.length);
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      setDisplayedText(
+        isDeleting
+          ? currentQuote.substring(0, displayedText.length - 1)
+          : currentQuote.substring(0, displayedText.length + 1)
+      );
+    }, typingSpeed);
+
+    return () => clearTimeout(timeout);
+  }, [displayedText, isDeleting, currentQuoteIndex]);
+
   const getHeadline = () => {
-    if (settings.language === 'es') return 'Tu Salud Mental Importa';
-    if (settings.language === 'fr') return 'Votre Santé Mentale Compte';
-    if (settings.language === 'de') return 'Ihre Psychische Gesundheit Ist Wichtig';
-    if (settings.language === 'zh') return '您的心理健康很重要';
-    return 'Your Mental Health Matters';
+    if (settings.language === 'es') return displayedText || 'Tu Salud Mental Importa';
+    if (settings.language === 'fr') return displayedText || 'Votre Santé Mentale Compte';
+    if (settings.language === 'de') return displayedText || 'Ihre Psychische Gesundheit Ist Wichtig';
+    if (settings.language === 'zh') return displayedText || '您的心理健康很重要';
+    return displayedText || 'Your Mental Health Matters';
   };
 
   const getDescription = () => {
@@ -60,9 +99,10 @@ const HeroSection = () => {
             className={`text-[#1F2933] text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6 max-w-2xl transition-all duration-1000 ${
               animationsTriggered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
             }`}
-            style={{ transitionDelay: '500ms' }}
+            style={{ transitionDelay: '500ms', minHeight: '1.2em' }}
           >
             {getHeadline()}
+            <span className="animate-pulse">|</span>
           </h1>
 
           <p 
