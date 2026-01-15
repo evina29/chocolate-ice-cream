@@ -11,35 +11,95 @@ import AccessibilityMenu from '@/components/AccessibilityMenu';
 // login/signup modal component
 const AuthModal = ({ onAuth }) => {
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({ username: '', password: '', email: '' });
+  const [formData, setFormData] = useState({ 
+    fullName: '',
+    username: '', 
+    password: '', 
+    confirmPassword: '',
+    email: '' 
+  });
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [errors, setErrors] = useState({});
+
+  // Password strength calculator
+  const calculatePasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^a-zA-Z0-9]/.test(password)) strength++;
+    return Math.min(strength, 4);
+  };
+
+  const handlePasswordChange = (password) => {
+    setFormData({ ...formData, password });
+    setPasswordStrength(calculatePasswordStrength(password));
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!isLogin) {
+      if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
+      if (!formData.email.trim()) newErrors.email = 'Email is required';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Invalid email format';
+      if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+      if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+    } else {
+      if (!formData.email.trim()) newErrors.email = 'Email is required';
+      if (!formData.password) newErrors.password = 'Password is required';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.username || !formData.password) return;
+    if (!validateForm()) return;
 
     const users = JSON.parse(localStorage.getItem('lumina-users') || '{}');
     
     if (isLogin) {
       // login
-      if (users[formData.username] && users[formData.username].password === formData.password) {
-        onAuth(formData.username);
+      const user = Object.values(users).find(u => u.email === formData.email);
+      if (user && user.password === formData.password) {
+        onAuth(user.fullName);
       } else {
-        alert('Invalid username or password');
+        setErrors({ general: 'Invalid email or password' });
       }
     } else {
       // signup
-      if (users[formData.username]) {
-        alert('Username already exists');
+      const emailExists = Object.values(users).some(u => u.email === formData.email);
+      if (emailExists) {
+        setErrors({ email: 'Email already registered' });
       } else {
-        users[formData.username] = {
-          password: formData.password,
+        const userId = Date.now().toString();
+        users[userId] = {
+          fullName: formData.fullName,
           email: formData.email,
+          password: formData.password,
           createdAt: Date.now()
         };
         localStorage.setItem('lumina-users', JSON.stringify(users));
-        onAuth(formData.username);
+        onAuth(formData.fullName);
       }
     }
+  };
+
+  const getPasswordStrengthColor = () => {
+    if (passwordStrength === 0) return 'bg-gray-200';
+    if (passwordStrength <= 2) return 'bg-red-500';
+    if (passwordStrength === 3) return 'bg-yellow-500';
+    return 'bg-green-500';
+  };
+
+  const getPasswordStrengthText = () => {
+    if (passwordStrength === 0) return '';
+    if (passwordStrength <= 2) return 'Weak';
+    if (passwordStrength === 3) return 'Good';
+    return 'Strong';
   };
 
   return (
@@ -47,6 +107,7 @@ const AuthModal = ({ onAuth }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-6"
+      onClick={(e) => e.target === e.currentTarget && setErrors({ ...errors, general: undefined })}
     >
       <motion.div
         initial={{ scale: 0.9, y: 20 }}
@@ -54,68 +115,115 @@ const AuthModal = ({ onAuth }) => {
         className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl"
       >
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-gradient-to-r from-[#FF7A59] to-[#6EC1E4] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-gradient-to-r from-[#FF6B6B] to-[#2563EB] rounded-full flex items-center justify-center mx-auto mb-4">
             <User className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-[#1F2933] mb-2">
-            {isLogin ? 'Welcome Back!' : 'Create Account'}
+          <h2 className="text-3xl font-bold text-[#111827] mb-2">
+            {isLogin ? 'Welcome Back' : 'Create Account'}
           </h2>
           <p className="text-[#6B7280]">
-            {isLogin ? 'Sign in to access your dashboard' : 'Start your mental health journey'}
+            {isLogin ? 'Sign in to access your dashboard' : 'Join Lumina to start your mental health journey'}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
-            <input
-              type="text"
-              value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border-2 border-[#E5E7EB] focus:border-[#6EC1E4] focus:outline-none transition-colors"
-              placeholder="Enter username"
-              required
-            />
+        {errors.general && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+            {errors.general}
           </div>
+        )}
 
+        <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
               <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 rounded-xl border-2 border-[#E5E7EB] focus:border-[#6EC1E4] focus:outline-none transition-colors"
-                placeholder="Enter email"
-                required={!isLogin}
+                type="text"
+                value={formData.fullName}
+                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                className={`w-full px-4 py-3 rounded-xl border-2 ${errors.fullName ? 'border-red-500' : 'border-[#E5E7EB]'} focus:border-[#2563EB] focus:outline-none transition-colors`}
+                placeholder="Enter your full name"
               />
+              {errors.fullName && <p className="text-red-500 text-xs mt-1">{errors.fullName}</p>}
             </div>
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+            <input
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className={`w-full px-4 py-3 rounded-xl border-2 ${errors.email ? 'border-red-500' : 'border-[#E5E7EB]'} focus:border-[#2563EB] focus:outline-none transition-colors`}
+              placeholder="Enter your email"
+            />
+            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {isLogin ? 'Password' : 'Create Password'}
+            </label>
             <input
               type="password"
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-3 rounded-xl border-2 border-[#E5E7EB] focus:border-[#6EC1E4] focus:outline-none transition-colors"
+              onChange={(e) => isLogin ? setFormData({ ...formData, password: e.target.value }) : handlePasswordChange(e.target.value)}
+              className={`w-full px-4 py-3 rounded-xl border-2 ${errors.password ? 'border-red-500' : 'border-[#E5E7EB]'} focus:border-[#2563EB] focus:outline-none transition-colors`}
               placeholder="Enter password"
-              required
             />
+            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+            
+            {!isLogin && formData.password && (
+              <div className="mt-2">
+                <div className="flex gap-1 mb-1">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className={`h-1 flex-1 rounded ${i < passwordStrength ? getPasswordStrengthColor() : 'bg-gray-200'}`} />
+                  ))}
+                </div>
+                <p className="text-xs text-gray-600">
+                  {getPasswordStrengthText()} {passwordStrength > 0 && '• 8+ characters recommended'}
+                </p>
+              </div>
+            )}
           </div>
+
+          {!isLogin && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+              <input
+                type="password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                className={`w-full px-4 py-3 rounded-xl border-2 ${errors.confirmPassword ? 'border-red-500' : 'border-[#E5E7EB]'} focus:border-[#2563EB] focus:outline-none transition-colors`}
+                placeholder="Confirm your password"
+              />
+              {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+            </div>
+          )}
 
           <button
             type="submit"
-            className="w-full bg-[#FF7A59] text-white py-3 rounded-xl font-semibold hover:bg-[#FF8A69] transition-all shadow-md hover:shadow-lg"
+            className="w-full bg-[#FF6B6B] text-white py-3 rounded-xl font-semibold hover:bg-[#FF8A8A] transition-all shadow-md hover:shadow-lg"
           >
             {isLogin ? 'Sign In' : 'Create Account'}
           </button>
         </form>
 
+        {!isLogin && (
+          <div className="mt-4 p-3 bg-blue-50 rounded-xl">
+            <p className="text-xs text-gray-600 text-center">
+              🔒 We respect your privacy. Your information is never shared.
+            </p>
+          </div>
+        )}
+
         <div className="mt-6 text-center">
           <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setErrors({});
+              setFormData({ fullName: '', username: '', password: '', confirmPassword: '', email: '' });
+            }}
+            className="text-[#2563EB] hover:text-[#1D4ED8] font-medium text-sm"
           >
             {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
           </button>
@@ -128,6 +236,8 @@ const AuthModal = ({ onAuth }) => {
 const Dashboard = () => {
   const router = useRouter();
   const [currentUser, setCurrentUser] = useState(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showLoginBanner, setShowLoginBanner] = useState(true);
   const [notifications, setNotifications] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
   const [moodData, setMoodData] = useState([]);
@@ -162,6 +272,9 @@ const Dashboard = () => {
     if (savedUser) {
       setCurrentUser(savedUser);
       loadUserData(savedUser);
+    } else {
+      // If no user is logged in, redirect to home page
+      window.location.href = '/';
     }
   }, []);
 
@@ -208,6 +321,8 @@ const Dashboard = () => {
     setCurrentUser(username);
     localStorage.setItem('lumina-current-user', username);
     loadUserData(username);
+    setShowAuthModal(false);
+    setShowLoginBanner(false);
   };
 
   // Handle logout
@@ -259,17 +374,6 @@ const Dashboard = () => {
 
   const handleQuickSuggestion = (suggestion) => {
     handleSendMessage(suggestion);
-  };
-
-  // Show auth modal if not logged in
-  if (!currentUser) {
-    return (
-      <>
-        <EmergencyBar />
-        <Navbar />
-        <AuthModal onAuth={handleAuth} />
-      </>
-    );
   }
 
   return (
@@ -292,19 +396,35 @@ const Dashboard = () => {
           className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4"
         >
           <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">Welcome back, {currentUser}! 👋</h1>
-            <p className="text-sm sm:text-base text-gray-600">Here's your mental health overview</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
+              {currentUser ? `Welcome back, ${currentUser}! 👋` : 'Welcome to Your Dashboard 👋'}
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600">
+              {currentUser ? "Here's your mental health overview" : 'Explore mental health tools and resources'}
+            </p>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-all shadow-md text-sm"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="hidden sm:inline">Logout</span>
-            <span className="sm:hidden">Exit</span>
-          </motion.button>
+          {currentUser ? (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-xl font-medium hover:bg-red-600 transition-all shadow-md text-sm"
+            >
+              <LogOut className="w-4 h-4" />
+              <span className="hidden sm:inline">Logout</span>
+              <span className="sm:hidden">Exit</span>
+            </motion.button>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowAuthModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#FF6B6B] text-white rounded-xl font-medium hover:bg-[#FF8A8A] transition-all shadow-md text-sm"
+            >
+              <User className="w-4 h-4" />
+              <span>Login / Sign Up</span>
+            </motion.button>
+          )}
         </motion.div>
 
         {/* Dashboard Grid */}
@@ -320,11 +440,11 @@ const Dashboard = () => {
             >
               <div className="flex items-center justify-between mb-3 sm:mb-4">
                 <div className="flex items-center gap-2 sm:gap-3">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#2563EB] rounded-full flex items-center justify-center">
                     <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-lg sm:text-xl font-bold text-gray-900">AI Assistant</h2>
+                    <h2 className="text-lg sm:text-xl font-bold text-[#111827]">AI Assistant</h2>
                     <p className="text-xs sm:text-sm text-green-600 flex items-center gap-1">
                       <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></span>
                       Online

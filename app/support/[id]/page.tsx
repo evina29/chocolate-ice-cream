@@ -24,6 +24,9 @@ import {
   isPostLiked as checkPostLiked
 } from '@/lib/forumStorage';
 import BackButton from '@/components/BackButton';
+import Navbar from '@/components/home/navbar';
+import EmergencyBar from '@/components/EmergencyBar';
+import AccessibilityMenu from '@/components/AccessibilityMenu';
 
 const DiscussionPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [newComment, setNewComment] = useState('');
@@ -129,6 +132,9 @@ const DiscussionPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <EmergencyBar />
+      <AccessibilityMenu />
+      <Navbar />
       {/* nav bar */}
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-6 py-4">
@@ -141,7 +147,22 @@ const DiscussionPage = ({ params }: { params: Promise<{ id: string }> }) => {
               >
                 <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-current' : ''}`} />
               </button>
-              <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors">
+              <button 
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({
+                      title: discussion.title,
+                      text: discussion.excerpt,
+                      url: window.location.href
+                    }).catch(err => console.log('Error sharing:', err));
+                  } else {
+                    navigator.clipboard.writeText(window.location.href);
+                    alert('Link copied to clipboard!');
+                  }
+                }}
+                className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                title="Share this discussion"
+              >
                 <Share2 className="w-5 h-5" />
               </button>
             </div>

@@ -10,6 +10,9 @@ import {
 } from '@/lib/forum';
 import { getTotalCommentCount } from '@/lib/forumStorage';
 import BackButton from '@/components/BackButton';
+import Navbar from '@/components/home/navbar';
+import EmergencyBar from '@/components/EmergencyBar';
+import AccessibilityMenu from '@/components/AccessibilityMenu';
 
 const MentalHealthForum = () => {
   const [selectedFilter, setSelectedFilter] = useState('View all');
@@ -84,6 +87,9 @@ const MentalHealthForum = () => {
 
   return (
     <div className="min-h-screen">
+      <EmergencyBar />
+      <AccessibilityMenu />
+      <Navbar />
       <div className="max-w-7xl mx-auto px-6 py-8 mt-20">
         {/* back btn */}
         <BackButton href="/" label="Back to Home" className="mb-6" />

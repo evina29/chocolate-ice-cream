@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import "./globals.css";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
+import { CartProvider } from "@/contexts/CartContext";
 
 const outfit = Outfit({
   variable: "--font-geist-sans",
@@ -67,7 +68,9 @@ export default function RootLayout({
         role="document"
       >
         <AccessibilityProvider>
-          {children}
+          <CartProvider>
+            {children}
+          </CartProvider>
         </AccessibilityProvider>
       </body>
     </html>

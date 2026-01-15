@@ -103,7 +103,14 @@ const MentalHealth = () => {
           {/* step 3 - track progress */}
           <div 
             className="bg-[#F9F4F2] rounded-3xl p-10 shadow-lg hover:shadow-xl hover:-translate-y-2 transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-[#82C7D6] group"
-            onClick={() => router.push('/dashboard')}
+            onClick={() => {
+              const currentUser = localStorage.getItem('lumina-current-user');
+              if (!currentUser) {
+                alert('Please sign up or log in first to access your dashboard.');
+                return;
+              }
+              router.push('/dashboard');
+            }}
           >
             <div className="flex flex-col items-center text-center">
               {/* Icon */}

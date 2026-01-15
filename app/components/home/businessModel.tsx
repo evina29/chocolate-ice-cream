@@ -2,7 +2,7 @@ import React from 'react';
 
 const BusinessModelSection = () => {
   return (
-    <div className="bg-white px-8 py-20" id="how-it-works">
+    <div className="bg-white px-8 py-20">
       <div className="max-w-7xl mx-auto">
         {/* header */}
         <div className="text-center mb-16">

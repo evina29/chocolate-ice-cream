@@ -2,16 +2,28 @@
 
 :root {
   --background: #F9FAFB;
-  --foreground: #1F2933;
+  --foreground: #111827;
   
-  /* Judge-safe mental health color palette */
-  --soft-off-white: #F9FAFB;
-  --warm-coral: #FF7A59;
-  --soft-sky-blue: #6EC1E4;
-  --deep-charcoal: #1F2933;
-  --muted-gray: #6B7280;
-  --pure-white: #FFFFFF;
-  --light-neutral-gray: #E5E7EB;
+  /* 4-Color Mental Health Palette */
+  /* Primary Action - Warm Coral */
+  --primary-coral: #FF6B6B;
+  --primary-coral-light: #FF8A8A;
+  --primary-coral-dark: #FF4D4D;
+  
+  /* Secondary/Trust - Calm Blue */
+  --secondary-blue: #2563EB;
+  --secondary-blue-light: #3B82F6;
+  --secondary-blue-dark: #1D4ED8;
+  
+  /* Text/Structure - Charcoal */
+  --text-charcoal: #111827;
+  --text-gray: #6B7280;
+  --text-light: #9CA3AF;
+  
+  /* Background - Soft Off-White */
+  --bg-off-white: #F9FAFB;
+  --bg-white: #FFFFFF;
+  --bg-light-gray: #F3F4F6;
   
   /* Dark mode palette */
   --dark-navy: #0F172A;
@@ -79,11 +91,6 @@ body {
   filter: contrast(1.5);
 }
 
-.high-contrast button,
-.high-contrast a {
-  border: 2px solid currentColor !important;
-}
-
 /* Reduced Motion */
 .reduce-motion *,
 .reduce-motion *::before,
@@ -101,39 +108,43 @@ body {
   line-height: 1.8;
 }
 
-/* Dark mode improvements for components */
+/* Dark mode improvements - subtle approach */
 .dark .bg-white {
-  background-color: #2d2d2d !important;
+  background-color: #1E293B;
 }
 
 .dark .bg-gray-50 {
-  background-color: #2a2a2a !important;
+  background-color: #0F172A;
 }
 
 .dark .bg-gray-100 {
-  background-color: #333333 !important;
+  background-color: #1E293B;
 }
 
 .dark .text-gray-900 {
-  color: #f5f5f5 !important;
+  color: #F8FAFC;
 }
 
 .dark .text-gray-800 {
-  color: #e5e5e5 !important;
+  color: #F1F5F9;
 }
 
 .dark .text-gray-700 {
-  color: #d5d5d5 !important;
+  color: #E2E8F0;
 }
 
 .dark .text-gray-600 {
-  color: #c5c5c5 !important;
+  color: #CBD5E1;
+}
+
+.dark .text-gray-500 {
+  color: #94A3B8;
 }
 
 .dark .border-gray-200 {
-  border-color: #444444 !important;
+  border-color: #334155;
 }
 
 .dark .border-gray-300 {
-  border-color: #555555 !important;
+  border-color: #475569;
 }

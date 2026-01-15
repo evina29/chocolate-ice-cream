@@ -4,6 +4,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/navigation';
 import Vapi from "@vapi-ai/web";
 import BackButton from '@/components/BackButton';
+import Navbar from '@/components/home/navbar';
+import EmergencyBar from '@/components/EmergencyBar';
+import AccessibilityMenu from '@/components/AccessibilityMenu';
 
 interface VapiWidgetProps {
   apiKey?: string;
@@ -107,9 +110,12 @@ const AIPage: React.FC<VapiWidgetProps> = ({
 
   return (
     <div className="min-h-screen bg-white">
+      <EmergencyBar />
+      <AccessibilityMenu />
+      <Navbar />
       <div className="max-w-7xl mx-auto px-6 py-8 mt-20">
         {/* back btn */}
-        <BackButton href="/dashboard" label="← Back to Dashboard" className="mb-6" />
+        <BackButton label="← Back" className="mb-6" />
         
         {/* header section */}
         <div className="mb-12">

@@ -6,7 +6,7 @@ import { Phone, AlertCircle } from 'lucide-react';
 const EmergencyBar = () => {
   return (
     <div 
-      className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-rose-400 via-pink-400 to-rose-500 dark:from-rose-500 dark:via-pink-500 dark:to-rose-600 text-white shadow-lg"
+      className="fixed top-0 left-0 right-0 z-50 bg-[#FF6B6B] dark:bg-[#FF4D4D] text-white shadow-lg"
       style={{height: '40px'}}
       role="alert"
       aria-live="polite"
@@ -14,7 +14,7 @@ const EmergencyBar = () => {
     >
       <a 
         href="tel:988" 
-        className="flex items-center justify-center h-full px-4 hover:bg-rose-500/90 dark:hover:bg-rose-600/90 transition-all hover:shadow-xl group"
+        className="flex items-center justify-center h-full px-4 hover:bg-[#FF4D4D] dark:hover:bg-[#FF3333] transition-all hover:shadow-xl group"
         aria-label="Call 988 for immediate mental health support"
       >
         <div className="flex items-center gap-3 animate-pulse-slow">
